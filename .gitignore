@@ -59,5 +59,3 @@ target/
 # 
 data/*
 processed_data/*
-old_data/*
-old_processed_data/*
