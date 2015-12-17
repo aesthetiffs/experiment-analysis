@@ -25,10 +25,14 @@ file_pairs = {}
 # Take all the files and organize them into a dict.
 for file_name in datafile_list: 
   if re.match('.*(pre|post).*', file_name) is None:
+    print "!! Skipped %s" %(file_name)
     continue
 
   # Operate on filename, not whole path!
   run_info = re.match('^([0-9]+)_([^_]+)_', os.path.basename(file_name))
+  if run_info is None:
+    print "!! Something is wrong with %s filename" %(file_name)
+    continue
   participant_num = run_info.group(1)
   experiment = run_info.group(2)
 
@@ -36,11 +40,12 @@ for file_name in datafile_list:
     file_pairs[participant_num] = {'pre': None, 'post': None}
 
   file_pairs[participant_num][experiment] = file_name
-
+  
 # Now we have participant number -> pre & post filenames.
 # The pre and post files are different, so load the CSV and pull out the
 # relevant columns, leaving the rest of the junk columns behind.
 for participant in file_pairs:
+
   print "* Participant %s processing..." % (participant)
   output_filename = '%s_all.csv' % (participant)
   output_path = os.path.join('.', output_dir, output_filename)
@@ -48,6 +53,12 @@ for participant in file_pairs:
   with open(output_path, 'wb') as csvfile:
     csv_writer = csv.writer(csvfile)
     csv_writer.writerow(extract_columns)
-    
-    mangleFile(file_pairs[participant]['pre'], csv_writer)
-    mangleFile(file_pairs[participant]['post'], csv_writer)
+
+    if file_pairs[participant]['pre'] is None or file_pairs[participant]['post'] is None:
+      print "!! Missing a file for participant # %s" %(participant)
+      continue
+    else:                      
+      mangleFile(file_pairs[participant]['pre'], csv_writer)
+      mangleFile(file_pairs[participant]['post'], csv_writer)
+
+print "All done!"
