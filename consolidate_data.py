@@ -14,8 +14,8 @@ def mangleFile(orig_filename, csv_writer):
   with open(orig_filename) as csv_fd:
     csv_rows = csv.DictReader(csv_fd)
     for row in csv_rows:
-      # new_csv.append([row[col_name] for col_name in extract_columns])
-      csv_writer.writerow([row[col_name] for col_name in extract_columns])
+      if row[extract_columns[0]] is not "":
+        csv_writer.writerow([row[col_name] for col_name in extract_columns])
 
   return True
 
